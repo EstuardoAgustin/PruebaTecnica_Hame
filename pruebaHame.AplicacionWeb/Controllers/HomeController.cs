@@ -59,7 +59,7 @@ namespace pruebaHame.AplicacionWeb.Controllers
                 FechaAltaCliente = DateTime.Today,
                 DireccionCliente = modelo.DireccionCliente,
                 TelefonoCliente = modelo.TelefonoCliente,
-                EstadoCliente = "activo"
+                EstadoCliente = "Activo"
             };
             bool respuesta = await _clienteService.insertarCliente(nuevoModelo);
             
@@ -127,7 +127,7 @@ namespace pruebaHame.AplicacionWeb.Controllers
                 CostoServicio= modelo.CostoServicio,
                 TipoServicio= modelo.TipoServicio,
                 DetalleServicio= modelo.DetalleServicio,
-                EstadoServicio= "activo"
+                EstadoServicio= "Activo"
                 
             };
             bool respuesta = await _servicioService.insert(nuevoServicio);

@@ -198,7 +198,6 @@
                    idCliente:0,
                    nombreCliente:"",
                    codigoCliente:"",
-                   // fechaAltaCliente:"",
                    direccionCliente:"",
                    telefonoCliente:"",
                    estadoCliente:""
@@ -222,7 +221,7 @@
         $(document).ready(() => {
             listaClientes();
             cargarServicios();
-            // listaServiciosAsociados()
+            
         })
 
         function showModal(modelo) 
@@ -230,7 +229,6 @@
             $("#txtIdCliente").val(modelo.idCliente);
             $("#txtNombre").val(modelo.nombreCliente);
             $("#txtCodCliente").val(modelo.codigoCliente);
-            // $("#txtFechaAlta").val(modelo.fechaAltaCliente);
             $("#txtTelefono").val(modelo.telefonoCliente);
             $("#txtDireccion").val(modelo.direccionCliente);
             $("#txtEstado").val(modelo.estadoCliente);
@@ -243,7 +241,6 @@
             NuevoModeloServicioAsociado["idClienteServicio"] = 0;
             NuevoModeloServicioAsociado["idClienteFk"] = $("#txtIdCliente").val();
             NuevoModeloServicioAsociado["nombreClienteAsociado"] = $("#txtNombre").val();
-
             NuevoModeloServicioAsociado["tipoClienteServicio"] = "";
             NuevoModeloServicioAsociado["estadoClienteServicio"] = "";
             NuevoModeloServicioAsociado["direccionClienteServicio"] = "";
@@ -287,61 +284,56 @@
             NuevoModelo["estadoCliente"] = $("#txtEstado").val();
 
             if ($("#txtIdCliente").val() == 0) {
-                fetch("Home/insertarCliente", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(NuevoModelo)
-                })
-                    .then((response) => {
-                        return response.ok ? response.json() : Promise.reject(response)
-                    })
-                    .then((dataJson) => {
-
+                $.ajax({
+                    url: "Home/insertarCliente",
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(NuevoModelo),
+                    success: function (dataJson) {
                         if (dataJson.valor) {
-                            alert("registrado");
+                            alert("Registrado correctamente");
                             $('#modalCliente').modal('hide');
                             listaClientes();
                         }
-                    })
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la solicitud AJAX:", status, error);
+                    }
+                });
+
             } else if ($("#txtIdCliente").val() != 0) //actualizamos el registro de nuestro cliente
             {
-                fetch("Home/actualizarCliente", {
-                    method: "PUT",
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(NuevoModelo)
-                })
-                    .then((response) => {
-                        return response.ok ? response.json() : Promise.reject(response)
-                    })
-                    .then((dataJson) => {
-
+                $.ajax({
+                    url: "Home/actualizarCliente",
+                    type: "PUT",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(NuevoModelo),
+                    success: function (dataJson) {
                         if (dataJson.valor) {
                             alert("Datos Actualizados");
                             $('#modalCliente').modal('hide');
                             listaClientes();
                         }
-                    })
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la solicitud AJAX:", status, error);
+                    }
+                });
+
             }
 
         })
 
         //listar todos los clientes en el table
         function listaClientes() {
-            fetch("Home/listarClientes")
-                .then((response) => {
-                    return response.ok ? response.json() : Promise.reject(response)
-                })
-                .then((dataJson) => {
-
-                   // arguments filas a la tabla
+            $.ajax({
+                url: "Home/listarClientes",
+                type: "GET",
+                dataType: "json",
+                success: function (dataJson) {
                     $("#tblCliente tbody").html("");
 
-                    dataJson.forEach((item) => {
-
+                    dataJson.forEach(function (item) {
                         $("#tblCliente tbody").append(
                             $("<tr>").append(
                                 $("<td>").text(item.idCliente),
@@ -355,11 +347,14 @@
                                     $("<button>").addClass("btn btn-danger btn-sm btn-eliminar").data("id", item.idCliente).text("Eliminar")
                                 )
                             )
-                        )
+                        );
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error en la solicitud AJAX:", status, error);
+                }
+            });
 
-                    })
-                   // fin ingreso de filas en columna 
-                })
         }
 
         //editar cliente
@@ -377,25 +372,30 @@
             let idCliente = $(this).data("id");
             console.log(idCliente);
             let resultado = window.confirm("¿Desea eliminar el Cliente?");
-            if (resultado) 
-            {
-                fetch("Home/deleteCliente?id="+idCliente, {
-                    method: "DELETE"
-                    
-                })
-                    .then((response) => {
-                        return response.ok ? response.json() : Promise.reject(response)
-                    })
-                    .then((dataJson) => {
-
+            if (resultado) {
+                $.ajax({
+                    url: "Home/deleteCliente",
+                    type: "DELETE",
+                    data: { id: idCliente },
+                    success: function (dataJson) {
                         if (dataJson.valor) {
                             alert("Cliente Eliminado Correctamente");
-                            
                             listaClientes();
+                        } else {
+                            // Manejar otro comportamiento si es necesario
                         }
-                    })
+                    },
+                    error: function (xhr, status, error) {
+                        if (xhr.status === 500) {
+                            alert("No se puede eliminar, Cliente tiene servicios Activos");
+                        } else {
+                            console.error("Error:", error);
+                        }
+                    }
+                });
             }
-        })
+        });
+
 
         //Ver Informacion Cliente
         $("#tblCliente tbody").on("click", ".btn-ver", function () {
@@ -432,7 +432,6 @@
                                 $("<td>").text(item.servicioAsociado.costoServicio),
                                 // $("<td>").text(item.estadoServicio),
                                 $("<td>").append(
-                                    // $("<button>").addClass("btn btn-success btn-sm me-2 btn-verServicoAsociado").data("modelo", item).text("Ver"),
                                     $("<button>").addClass("btn btn-primary btn-sm me-2 btn-editarServicoAsociado").data("modelo", item).text("Editar"),
                                     $("<button>").addClass("btn btn-danger btn-sm btn-eliminarServicoAsociado").data("id", item.idClienteServicio).text("Eliminar")
                                 )
@@ -495,27 +494,24 @@
 
 
             if ($("#txtIdServicioASociado").val() == 0) {
-                console.log("entro a la validacion guardar servicio asociado");
-                fetch("Home/insertarServicioAsociado_Cliente", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify(NuevoModelo)
-                })
-                    .then((response) => {
-                        return response.ok ? response.json() : Promise.reject(response)
-                    })
-                    .then((dataJson) => {
 
+                $.ajax({
+                    url: "Home/insertarServicioAsociado_Cliente",
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(NuevoModelo),
+                    success: function (dataJson) {
                         if (dataJson.valor) {
                             alert("Servicio Asociado Correctamente");
                             $('#modalServiciosAsociados').modal('hide');
-
                             listaServiciosAsociadosCliente(idCliente);
-
                         }
-                    })
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la solicitud AJAX:", status, error);
+                    }
+                });
+
             } else if ($("#txtIdCliente").val() != 0) //actualizamos el registro de nuestro cliente
             {
                $.ajax({
@@ -582,7 +578,7 @@
                         console.error("Error en la solicitud AJAX:", status, error);
                     }
                 });
-            }
+            } 
         })
     </script>
 }              

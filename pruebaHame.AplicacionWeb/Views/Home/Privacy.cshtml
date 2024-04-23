@@ -71,7 +71,11 @@
                 </div>
                 <div class="mb-2">
                     <label>Estado</label>
-                    <input type="text" class="form-control" id="txtEstadoServicio" />
+                    @* <input type="text" class="form-control" id="txtEstadoServicio" /> *@
+                    <select class="form-control" id="txtEstadoServicio">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">
@@ -89,7 +93,7 @@
     <script>
         $(document).ready(() => {
             listaServicios();
-            // alert("Iniciando Servicios");
+            
         })
         //modelo que seteara valores vacios iniciales al formulario
         const modeloBase =
@@ -241,7 +245,12 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        console.error("Error en la solicitud AJAX:", status, error);
+                        if (xhr.status === 500) {
+                            // Si el error es un error de servidor (status 500), mostrar una alerta de error
+                            alert("No se puede eliminar, Servicio tiene Clientes Asociados");
+                        } else {
+                            console.error("Error en la solicitud AJAX:", status, error);
+                        }
                     }
                 });
             }
