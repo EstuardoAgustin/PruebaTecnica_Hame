@@ -49,14 +49,14 @@
             <div class="modal-body">
                 <input type="hidden" id="txtIdCliente" value="0" />
                 <div class="mb-2">
-                    <label>Nombre</label>
-                    <input type="text" class="form-control" id="txtNombre" />
+                    <label>Nombre Cliente</label>
+                    <input type="text" class="form-control" id="txtNombre" required />
                 </div>
                 <div class="mb-2">
                     <label>Codigo Cliente</label>
                     <input type="text" class="form-control" id="txtCodCliente" />
                 </div>
-                <div class="mb-2">
+                <div class="d-none">
                     <label>Fecha Alta</label>
                     <input type="text" class="form-control" id="txtFechaAlta" />
                 </div>
@@ -70,15 +70,21 @@
                 </div>
                 <div class="mb-2">
                     <label>Estado</label>
-                    <input type="text" class="form-control" id="txtEstado" />
+                    @* <input type="text" class="form-control" id="txtEstado" /> *@
+                    <select class="form-control" id="txtEstado">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
                 </div>
-                <div class="row">
+
+
+                <div class="row" id="GrupoServiciosAsociados">
                     <div class="col-sm-12">
 
 
                         <h3>Paquete Contratado</h3>
                         <button class="btn btn-success" id="btnAgregarServicio">Agregar Servicio</button>
-                        <button class="btn btn-primary" id="btnVerPaqueteContratado">Ver Paquete</button>
+                        @* <button class="btn btn-primary" id="btnVerPaqueteContratado">Ver Paquete</button> *@
                         <h4>Servicios Asociados</h4>
                         <table class="table table-striped" id="tblServicioAsociados">
                             <thead>
@@ -117,11 +123,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="txtIdServicioASociado" value="0" />
+                <input type="hidden" id="txtIdServicioASociado" value="0" />
                 <div class="mb-2">
                     <label>Nombre Cliente</label>
-                    <input type="text" id="txtIdClienteASociado" value="0" />
-                    <input type="text" class="form-control" id="txtNombreClienteAsociado" />
+                    <input type="hidden" id="txtIdClienteASociado" value="0" />
+                    <input type="text" class="form-control" id="txtNombreClienteAsociado" readonly/>
                 </div>
                 
                 <div class="mb-2">
@@ -134,7 +140,13 @@
                 <div class="mb-2">
                     <label>Tipo Servicio</label>
                     
-                    <input type="text" class="form-control" id="txtTipoServicioAsociado" />
+                    @* <input type="text" class="form-control" id="txtTipoServicioAsociado" /> *@
+                    <select class="form-control" id="txtTipoServicioAsociado">
+                        <option value="OTRO">INTERNET</option>
+                        <option value="CABLE TV">CABLE TV</option>
+                        <option value="TELEFONIA">TELEFONIA</option>
+                        <option value="CABLE TV">OTRO</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label>Direccion Instalacion</label>
@@ -150,7 +162,12 @@
                 </div>
                 <div class="mb-2">
                     <label>Paquete TV</label>
-                    <input type="text" class="form-control" id="txtPaqueteServicioAsociado" />
+                    @* <input type="text" class="form-control" id="txtPaqueteServicioAsociado" /> *@
+                    <select class="form-control" id="txtPaqueteServicioAsociado">
+                        <option value="NINGUNO">NINGUNO</option>
+                        <option value="BASICO">BASICO</option>
+                        <option value="PREMIUM">PREMIUM</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label>Detalles del Servicio</label>
@@ -165,7 +182,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btnGuardarServicioAsociado">Agregar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarServicioAsociado">Guardar</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -253,6 +270,8 @@
         
         // modeloBase el modal con el boton Nuevo Cliente
         $("#btnNuevo").click(() => {
+            $("#tblServicioAsociados tbody").html("");
+            $("#GrupoServiciosAsociados").hide(); // Ocultar el div
             showModal(modeloBase);
         })
 
@@ -331,7 +350,7 @@
                                 $("<td>").text(item.direccionCliente),
                                 $("<td>").text(item.telefonoCliente),
                                 $("<td>").append(
-                                    $("<button>").addClass("btn btn-success btn-sm me-2 btn-ver").data("modelo", item).text("Ver"),
+                                    $("<button>").addClass("btn btn-success btn-sm me-2 btn-ver").data("modelo", item).text("Ver Servicios"),
                                     $("<button>").addClass("btn btn-primary btn-sm me-2 btn-editar").data("modelo", item).text("Editar"),
                                     $("<button>").addClass("btn btn-danger btn-sm btn-eliminar").data("id", item.idCliente).text("Eliminar")
                                 )
@@ -347,6 +366,7 @@
         $("#tblCliente tbody").on("click", ".btn-editar", function () {
             let cliente = $(this).data("modelo");
             console.log(cliente);
+            $("#GrupoServiciosAsociados").hide(); // Ocultar el div
             // Limpiar tabla
             $("#tblServicioAsociados tbody").html("");
             showModal(cliente);
@@ -382,6 +402,7 @@
             let cliente = $(this).data("modelo");
             let idCliente = cliente.idCliente; // Aquí debes obtener el id del cliente de alguna manera
             console.log(idCliente);
+            $("#GrupoServiciosAsociados").show(); // Mostrar el div
             listaServiciosAsociadosCliente(idCliente);
             showModal(cliente);
         })
@@ -411,7 +432,7 @@
                                 $("<td>").text(item.servicioAsociado.costoServicio),
                                 // $("<td>").text(item.estadoServicio),
                                 $("<td>").append(
-                                    $("<button>").addClass("btn btn-success btn-sm me-2 btn-verServicoAsociado").data("modelo", item).text("Ver"),
+                                    // $("<button>").addClass("btn btn-success btn-sm me-2 btn-verServicoAsociado").data("modelo", item).text("Ver"),
                                     $("<button>").addClass("btn btn-primary btn-sm me-2 btn-editarServicoAsociado").data("modelo", item).text("Editar"),
                                     $("<button>").addClass("btn btn-danger btn-sm btn-eliminarServicoAsociado").data("id", item.idClienteServicio).text("Eliminar")
                                 )
@@ -497,27 +518,71 @@
                     })
             } else if ($("#txtIdCliente").val() != 0) //actualizamos el registro de nuestro cliente
             {
-                // fetch("Home/actualizarCliente", {
-                //     method: "PUT",
-                //     headers: {
-                //         'Content-Type': 'application/json;charset=utf-8'
-                //     },
-                //     body: JSON.stringify(NuevoModelo)
-                // })
-                //     .then((response) => {
-                //         return response.ok ? response.json() : Promise.reject(response)
-                //     })
-                //     .then((dataJson) => {
+               $.ajax({
+                    url: "../Home/actualizarServicioASociado",
+                    type: "PUT",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(NuevoModelo),
+                    success: function (dataJson) {
+                        if (dataJson.valor) {
+                            alert("Servicio Actualizado Correctamente");
+                            $('#modalServiciosAsociados').modal('hide');
 
-                //         if (dataJson.valor) {
-                //             alert("Datos Actualizados");
-                //             $('#modalCliente').modal('hide');
-                //             listaClientes();
-                //         }
-                //     })
+                            listaServiciosAsociadosCliente(idCliente);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la solicitud AJAX:", status, error);
+                    }
+                });
             }
 
         })
 
+        //editar Servicio Asociado
+        $("#tblServicioAsociados tbody").on("click", ".btn-editarServicoAsociado", function () {
+            let servicioAsociado = $(this).data("modelo");
+            console.log(servicioAsociado);
+
+            $("#txtIdServicioASociado").val(servicioAsociado.idClienteServicio);
+            $("#txtIdClienteASociado").val(servicioAsociado.idClienteFk);
+            $("#txtNombreClienteAsociado").val(servicioAsociado.clienteAsociado.nombreCliente);
+            $("#selectServicios").val(servicioAsociado.idServicioFk);
+            $("#txtTipoServicioAsociado").val(servicioAsociado.tipoClienteServicio);
+            $("#txtDirInstalacionServicioAsociado").val(servicioAsociado.direccionClienteServicio);
+            $("#txtCoordenadasServicioAsociado").val(servicioAsociado.ubicacionClienteServicio);
+            $("#txtVelocidadServicioAsociado").val(servicioAsociado.velocidadClienteServicio);
+            $("#txtPaqueteServicioAsociado").val(servicioAsociado.paqueteClienteServicio);
+            $("#txtDetalleServicioAsociado").val(servicioAsociado.detallesClienteServicio);
+            $("#selectEstadoServicioAsociado").val(servicioAsociado.estadoClienteServicio);
+            $("#modalServiciosAsociados").modal('show');
+            
+        })
+
+        //metodo para eliminar servicio Asociado a un Cliente
+        $("#tblServicioAsociados tbody").on("click", ".btn-eliminarServicoAsociado", function () {
+            let idServicio = $(this).data("id");
+            let idCliente = $("#txtIdCliente").val(); // Aquí debes obtener el id del cliente
+            console.log(idCliente);
+            let resultado = window.confirm("¿Desea eliminar el Servicio?");
+            if (resultado) {
+
+
+                $.ajax({
+                    url: "../Home/deleteServicioAsociado",
+                    type: "DELETE",
+                    data: { id: idServicio },
+                    success: function (dataJson) {
+                        if (dataJson.valor) {
+                            alert("Servicio Eliminado Correctamente");
+                            listaServiciosAsociadosCliente(idCliente);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la solicitud AJAX:", status, error);
+                    }
+                });
+            }
+        })
     </script>
 }              

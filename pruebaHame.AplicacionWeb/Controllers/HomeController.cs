@@ -236,6 +236,7 @@ namespace pruebaHame.AplicacionWeb.Controllers
             return StatusCode(StatusCodes.Status200OK, lista);
         }
 
+        [HttpPost]
         public async Task<IActionResult> insertarServicioAsociado_Cliente([FromBody] VMServiciosAsociados modelo)
         {
             ClienteServicio nuevoServicioAsociado = new ClienteServicio()
@@ -252,6 +253,36 @@ namespace pruebaHame.AplicacionWeb.Controllers
 
             };
             bool respuesta = await _servicioAsociadosService.insert(nuevoServicioAsociado);
+
+            return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> deleteServicioAsociado(int id)
+        {
+
+            bool respuesta = await _servicioAsociadosService.delete(id);
+
+            return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> actualizarServicioASociado([FromBody] VMServiciosAsociados modelo)
+        {
+            ClienteServicio nuevoModelo = new ClienteServicio()
+            {
+                IdClienteServicio = modelo.IdClienteServicio,
+                IdClienteFk=modelo.IdClienteFk,
+                IdServicioFk=modelo.IdServicioFk,  
+                TipoClienteServicio=modelo.TipoClienteServicio,
+                EstadoClienteServicio=modelo.EstadoClienteServicio,
+                DireccionClienteServicio=modelo.DireccionClienteServicio,
+                UbicacionClienteServicio=modelo.UbicacionClienteServicio,
+                VelocidadClienteServicio=modelo.VelocidadClienteServicio,
+                PaqueteClienteServicio=modelo.PaqueteClienteServicio,
+                DetallesClienteServicio=modelo.DetallesClienteServicio
+            };
+            bool respuesta = await _servicioAsociadosService.update(nuevoModelo);
 
             return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
         }
